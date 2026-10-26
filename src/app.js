@@ -125,31 +125,67 @@ addbtn.addEventListener("click", () => {
 
 /* ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
-    function calculer(montantvalue , nombreParticipants) {
-        return montantvalue * nombreParticipants
-    }
 
-function calculerTotalCycle(montantvalue , nombreTours){
-    return montantvalue * nombreTours
+function calculer(montantvalue, nombreParticipants) {
+    return montantvalue * nombreParticipants;
 }
-    
+
+function calculerTotalCycle(montantvalue, nombreTours) {
+    return montantvalue * nombreTours;
+}
+
 function calculerNombreTours(nombreParticipants) {
     return nombreParticipants;
 }
 
-const montantvalue = Number(document.querySelector("#cotisation").value);
-const nombreParticipants = document.querySelector("#participants-liste").children.length;
+const form = document.getElementById("daret-form");
 
-const nombreTours = calculerNombreTours(nombreParticipants);
-const cagnotte = calculer(montantvalue, nombreParticipants);
-const totalCycle = calculerTotalCycle(montantvalue, nombreTours);
+const resumeCagnotte = document.getElementById("resume-cagnotte");
+const resumeTotalCycle = document.getElementById("resume-total-cycle");
+const resumeNbTours = document.getElementById("resume-nb-tours");
+const resumeDates = document.getElementById("resume-dates");
 
-console.log(cagnotte);
-console.log(totalCycle);
-console.log(nombreTours);
+const contenuResultat = document.getElementById("contenu-resultat");
+const etatVide = document.getElementById("etat-vide");
+
+form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const montantvalue = Number(document.getElementById("cotisation").value);
+    const nombreParticipants = liste.children.length;
+    const nombreTours = calculerNombreTours(nombreParticipants);
+    const cagnotte = calculer(montantvalue, nombreParticipants);
+    const totalCycle = calculerTotalCycle(montantvalue, nombreTours);
+    resumeCagnotte.textContent = `${cagnotte} MAD`;
+    resumeTotalCycle.textContent = `${totalCycle} MAD`;
+    resumeNbTours.textContent = nombreTours;
+    const dateDebut = new Date(document.getElementById("date-debut").value + "T00:00:00");
+    const periodicite = document.getElementById("periodicite").value;
+    const dateFin = new Date(dateDebut);
+    if (periodicite === "hebdomadaire") {
+        dateFin.setDate(dateFin.getDate() + 7 * (nombreTours - 1));
+    } else if (periodicite === "quinzaine") {
+        dateFin.setDate(dateFin.getDate() + 14 * (nombreTours - 1));
+    } else if (periodicite === "mensuelle") {
+        const jour = dateFin.getDate();
+        dateFin.setDate(1);
+        dateFin.setMonth(dateFin.getMonth() + nombreTours - 1);
+        const dernierJour = new Date(
+            dateFin.getFullYear(),
+            dateFin.getMonth() + 1,
+            0
+        ).getDate();
+        dateFin.setDate(Math.min(jour, dernierJour));
+    }
+    const optionsDate = {
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+    };
+    const premiereDate = dateDebut.toLocaleDateString("fr-FR", optionsDate);
+    const derniereDate = dateFin.toLocaleDateString("fr-FR", optionsDate);
+    resumeDates.textContent = `${premiereDate} — ${derniereDate}`;
+    etatVide.classList.add("hidden");
+    contenuResultat.classList.remove("hidden");
+});
 
 
-const resume = document.getElementById("resume-cagnotte")
-    resume.style.display = ("block")
-    resume.textContent = "djaja"
-    
